@@ -4,5 +4,9 @@
 using namespace std;
 
 int main() {
-cout << "Hello world" << endl;
+    int string;
+    cout << endl;
+    cout << "Hello world" << endl;
+    cout << "Enter an expression" << endl;
+    cin >> string;
 }
