@@ -6,6 +6,12 @@
 
 using namespace std;
 
+int calculating (string line)
+{
+    cout << "I got " << line << endl;
+
+    return 15;
+}
 
 int main() {
     const string OUTPUT_FILE = "out.txt";
@@ -23,6 +29,7 @@ int main() {
     string line;
     while (getline(inputFile, line)) {
         cout << line << endl;
+        calculating(line);
     }
 
 
