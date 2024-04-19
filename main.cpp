@@ -3,14 +3,55 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
+#include <stdlib.h>
+#include <math.h>
+#include <ctype.h>
+#include <iomanip>
+#include <sstream>
 
 using namespace std;
 
-int calculating (string line)
-{
-    cout << "I got " << line << endl;
+bool isDigit(char c) {
+    return (c >= '0' && c <= '9');
+}
 
-    return 15;
+string simplifyExpression(const string& expression) {
+
+    cout << "I got: " << expression << endl;
+
+    if (expression.empty()) 
+    {
+        cout << "The line is empty." << endl;
+    } 
+
+    stringstream ss(expression);
+    string token;
+    vector<int> numbers;
+    int sum = 0;
+
+    while (getline(ss, token, '+')) {
+        stringstream num_ss(token);
+        char c;
+        bool all_digits = true;
+        while (num_ss >> c) {
+            if (!isDigit(c)) {
+                all_digits = false;
+                cout << "Error found" << endl;
+                break;
+            }
+        }
+        if (all_digits) {
+            int num;
+            num_ss.clear();
+            num_ss.seekg(0);
+            if (num_ss >> num) {
+                sum += num;
+            }
+        }
+    }
+
+    return to_string(sum);
 }
 
 int main() {
@@ -26,14 +67,6 @@ int main() {
         return 1; // Maybe different error
     }
 
-    string line;
-    while (getline(inputFile, line)) {
-        cout << line << endl;
-        calculating(line);
-    }
-
-
-
     outputFile.open(OUTPUT_FILE);
 
     if (!outputFile) {
@@ -41,15 +74,24 @@ int main() {
         return 1; // Maybe different error
     }
 
-    outputFile << "25" << endl;
+    string line;
+    while (getline(inputFile, line)) {
+        //cout << "Answer is " << calculating(line) << endl;
+        cout << simplifyExpression(line) << endl;
+        //outputFile << simplifyExpression(line) << endl;
+        cout << endl;
+    }
+
+
 
     // cout << endl;
     // cout << "Use case is:    ./main.cpp <filename.txt>" << endl;
     // cout << "If no file name is detected, you will need to enter expression manually" << endl;
-    // cout << "Quit by typing <q> or <exit>" << endl;
+    // cout << "Quit by typing \"q\" or \"exit\" and [Enter]" << endl;
     // cout << endl;
     // cout << "Please enter the expresion" << endl;
     //while(true)
+    //if(input == "quit") break;
 
     //if file does not exist:
     //return EXIT_FAILURE
