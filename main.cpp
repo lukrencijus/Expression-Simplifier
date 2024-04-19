@@ -1,5 +1,3 @@
-//This program reads expressions from provided text file
-//If no file is provided, user can enter input directly
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -7,51 +5,62 @@
 #include <stdlib.h>
 #include <math.h>
 #include <ctype.h>
+#include <cctype>
 #include <iomanip>
 #include <sstream>
 
 using namespace std;
 
 bool isDigit(char c) {
-    return (c >= '0' && c <= '9');
+    return isdigit(c);
 }
 
-string simplifyExpression(const string& expression) {
+int charToDigit(char c) {
+    return c - '0';
+}
 
-    cout << "I got: " << expression << endl;
-
-    if (expression.empty()) 
-    {
-        cout << "The line is empty." << endl;
-    } 
-
-    stringstream ss(expression);
-    string token;
-    vector<int> numbers;
+int simplifyExpression(const string& expression) {
+    int result = 0;
     int sum = 0;
+    int num = 0;
+    bool inNumber = false;
+    char op = '+';
 
-    while (getline(ss, token, '+')) {
-        stringstream num_ss(token);
-        char c;
-        bool all_digits = true;
-        while (num_ss >> c) {
-            if (!isDigit(c)) {
-                all_digits = false;
-                cout << "Error found" << endl;
-                break;
+
+   for (char c : expression) {
+        if (isDigit(c)) {
+            num = num * 10 + (c - '0');
+            inNumber = true;
+        } else if (c == '+' || c == '-' || c == '*') {
+            if (inNumber) {
+                if (op == '+') {
+                    result += num;
+                } else if (op == '-') {
+                    result -= num;
+                } else if (op == '*') {
+                    result *= num;
+                }
+                num = 0;
+                inNumber = false;
             }
-        }
-        if (all_digits) {
-            int num;
-            num_ss.clear();
-            num_ss.seekg(0);
-            if (num_ss >> num) {
-                sum += num;
-            }
+            op = c;
+        } else {
+            // Ignore other characters
         }
     }
 
-    return to_string(sum);
+    // Add/subtract the last number if the expression doesn't end with '+' or '-' or '*'
+    if (inNumber) {
+        if (op == '+') {
+            result += num;
+        } else if (op == '-') {
+            result -= num;
+        } else if (op == '*') {
+            result *= num;
+        }
+    }
+
+    return (result);
 }
 
 int main() {
@@ -62,24 +71,33 @@ int main() {
 
     inputFile.open("in.txt");   //but it should be provided from cmd
 
-    if (!inputFile) {
+    if (!inputFile) 
+    {
         cerr << "Unable to open file";
         return 1; // Maybe different error
     }
 
     outputFile.open(OUTPUT_FILE);
 
-    if (!outputFile) {
+    if (!outputFile) 
+    {
         cerr << "Unable to open file";
         return 1; // Maybe different error
     }
 
     string line;
-    while (getline(inputFile, line)) {
-        //cout << "Answer is " << calculating(line) << endl;
-        cout << simplifyExpression(line) << endl;
-        //outputFile << simplifyExpression(line) << endl;
-        cout << endl;
+    while (getline(inputFile, line)) 
+    {
+        if (simplifyExpression(line) == 0)
+        {
+            cout << endl;
+        }
+        else
+        {
+            cout << simplifyExpression(line) << endl;
+            cout << endl;
+        }
+
     }
 
 
