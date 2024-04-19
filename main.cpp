@@ -11,57 +11,100 @@
 
 using namespace std;
 
-bool isDigit(char c) {
-    return isdigit(c);
+//ToDo
+//brackets for priorities
+//unary negation
+
+// Function to perform addition
+int addition(int a, int b) {
+    return a + b;
 }
 
-int charToDigit(char c) {
-    return c - '0';
+// Function to perform subtraction
+int subtraction(int a, int b) {
+    return a - b;
 }
 
+// Function to perform multiplication
+int multiplication(int a, int b) {
+    return a * b;
+}
+
+// Function to perform division
+int division(int a, int b) {
+    if (b != 0) {
+        return a / b;
+    } else {
+        cout << "Error: Division by zero!" << endl;
+        return 0; // You may handle this error differently based on your needs
+    }
+}
+
+// Function to simplify an expression
 int simplifyExpression(const string& expression) {
     int result = 0;
-    int sum = 0;
     int num = 0;
     bool inNumber = false;
     char op = '+';
 
+    for (size_t i = 0; i < expression.size(); ++i) {
+        char c = expression[i];
+        char cc = (i < expression.size() - 1) ? expression[i + 1] : '\0'; // Next character
 
-   for (char c : expression) {
-        if (isDigit(c)) {
+        if (isdigit(c)) {
             num = num * 10 + (c - '0');
             inNumber = true;
-        } else if (c == '+' || c == '-' || c == '*') {
+        } else if (c == '+' || c == '-' || c == '*' || c == '/') {
             if (inNumber) {
-                if (op == '+') {
-                    result += num;
-                } else if (op == '-') {
-                    result -= num;
-                } else if (op == '*') {
-                    result *= num;
+                switch (op) {
+                    case '+':
+                        result = addition(result, num);
+                        break;
+                    case '-':
+                        result = subtraction(result, num);
+                        break;
+                    case '*':
+                        result = multiplication(result, num);
+                        break;
+                    case '/':
+                        result = division(result, num);
+                        break;
                 }
                 num = 0;
                 inNumber = false;
             }
             op = c;
-        } else {
-            // Ignore other characters
+        } else if (c == '-' && cc == '-') {
+            if (inNumber) {
+                result = addition(result, num);
+                num = 0;
+                inNumber = false;
+            }
         }
+        // Ignore other characters
     }
 
-    // Add/subtract the last number if the expression doesn't end with '+' or '-' or '*'
+    // Add/subtract/multiply/divide the last number if the expression doesn't end with an operator
     if (inNumber) {
-        if (op == '+') {
-            result += num;
-        } else if (op == '-') {
-            result -= num;
-        } else if (op == '*') {
-            result *= num;
+        switch (op) {
+            case '+':
+                result = addition(result, num);
+                break;
+            case '-':
+                result = subtraction(result, num);
+                break;
+            case '*':
+                result = multiplication(result, num);
+                break;
+            case '/':
+                result = division(result, num);
+                break;
         }
     }
 
-    return (result);
+    return result;
 }
+
 
 int main() {
     const string OUTPUT_FILE = "out.txt";
