@@ -19,42 +19,7 @@ using namespace std;
 //STRINGAS NERA TIUSCIAS
 //JEIGU YRA TAI TIESIOG PADARO JI TUSCIA IR ISSIUNCIA ATGAL
 
-string performAddition(std::string str) {
-    string result = "";
-    string temp;
-    istringstream iss(str);
-    while (std::getline(iss, temp, '-')) {
-        istringstream iss2(temp);
-        string number;
-        int sum = 0;
-        bool multiply = false;
-        while (getline(iss2, number, '+')) {
-                sum += std::stoi(number);
-        }
-        result += to_string(sum) + "-";
-    }
-    result.pop_back(); // remove trailing '-'
-    return result;
-}
 
-// string performAddition(std::string str) {
-//     string result = "";                 //5+5         = 10
-//     string temp;                        //5+5-5       = 10-5
-//     istringstream iss(str);             //5-5+10      = 5-15
-//     int sum = 0;                        //10+5-5      = 15-5                       
-//     while (getline(iss, temp, '-')) {   
-//             if (temp.find('*') == std::string::npos || temp.find('/') == std::string::npos || temp.find('+') == std::string::npos) {
-//                 sum += std::stoi(temp);
-//             } else {
-//                 result += temp + "-";
-//                 continue;
-//             }
-//         }
-//         result += std::to_string(sum) + "-";
-    
-//     result.pop_back(); // remove trailing '-'
-//     return result;
-// }
 
 // string subtraction (const string& expression){
 //     //gal ne const
@@ -117,6 +82,22 @@ int simplifyExpression(const string& expression) {
         return (result);
 }
 
+int evaluateParentheses(std::string str) {
+    int result = 0;
+    string temp;
+    stringstream ss(str);
+    while (getline(ss, temp, '(')) 
+    {
+        stringstream ss2(temp);
+        string inside;
+        while (getline(ss2, inside, ')')) 
+        {
+            result = simplifyExpression(inside);
+        }
+    }
+    return result;
+}
+
 
 int main() {
     const string OUTPUT_FILE = "out.txt";
@@ -153,7 +134,7 @@ int main() {
         //      cout << endl;
         // }
 
-        cout << performAddition(line) << endl;
+        cout << evaluateParentheses(line) << endl;
     }
 
 
