@@ -105,7 +105,7 @@ bool isDigit(char c) {
 bool hasOnlyNumbersOrOperations(string str) {
     if (simplifyExpression(str) == 0) return false;
     for (char c : str) {
-        if (!(c == '+' || c == '-' || c == '*' || c == '/' || isDigit(c))) {
+        if (!(c == '+' || c == '-' || c == '*' || c == '/' || c == ' ' || c == '(' || c == ')' || isDigit(c))) {
             return false;
         }
     }
