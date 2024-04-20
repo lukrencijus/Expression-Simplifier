@@ -82,7 +82,7 @@ int simplifyExpression(const string& expression) {
         return (result);
 }
 
-int evaluateParentheses(std::string str) {
+int evaluateParentheses(string str) {
     int result = 0;
     string temp;
     stringstream ss(str);
@@ -96,6 +96,20 @@ int evaluateParentheses(std::string str) {
         }
     }
     return result;
+}
+
+bool isDigit(char c) {
+    return (c >= '0' && c <= '9');
+}
+
+bool hasOnlyNumbersOrOperations(string str) {
+    if (simplifyExpression(str) == 0) return false;
+    for (char c : str) {
+        if (!(c == '+' || c == '-' || c == '*' || c == '/' || isDigit(c))) {
+            return false;
+        }
+    }
+    return true;
 }
 
 
@@ -124,19 +138,22 @@ int main() {
     string line;
     while (getline(inputFile, line)) 
     {
-        // if (simplifyExpression(line) == 0)
-        // {
-        //     cout << endl;
-        // }
-        // else
-        // {
-        //      cout << simplifyExpression(line) << endl;
-        //      cout << endl;
-        // }
-
-        cout << evaluateParentheses(line) << endl;
+        if(hasOnlyNumbersOrOperations(line))
+        {
+              cout << evaluateParentheses(line) << endl;
+              cout << endl;
+        }
+        else if (simplifyExpression(line) == 0)
+        {
+            cout << endl;
+            cout << endl;
+        }
+        else
+        {
+            cout << "Error: invalid expression" << endl;
+            cout << endl;
+        }
     }
-
 
 
     // cout << endl;
