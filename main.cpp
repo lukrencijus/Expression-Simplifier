@@ -8,18 +8,9 @@
 #include <cctype>
 #include <iomanip>
 #include <sstream>
+#include <cstdlib> 
 
 using namespace std;
-
-//ToDo
-//brackets for priorities
-//unary negation
-
-//PRIDETI FUNKCIJA KURI PIRMA PATIKRINA AR 
-//STRINGAS NERA TIUSCIAS
-//JEIGU YRA TAI TIESIOG PADARO JI TUSCIA IR ISSIUNCIA ATGAL
-
-
 
 // string subtraction (const string& expression){
 //     //gal ne const
@@ -35,7 +26,8 @@ using namespace std;
 //     }
 // }
 
-int simplifyExpression(const string& expression) {
+int simplifyExpression(const string& expression) 
+{
     int result = 0;
     int sum = 0;
     int num = 0;
@@ -61,12 +53,9 @@ int simplifyExpression(const string& expression) {
                 inNumber = false;
             }
             op = c;
-        } else {
-            // Ignore other characters
         }
     }
 
-    // Add/subtract the last number if the expression doesn't end with '+' or '-' or '*'
         if (inNumber) {
             if (op == '+') {
                 result += num;
@@ -82,7 +71,8 @@ int simplifyExpression(const string& expression) {
         return (result);
 }
 
-int evaluateParentheses(string str) {
+int evaluateParentheses(string str) 
+{
     int result = 0;
     string temp;
     stringstream ss(str);
@@ -98,12 +88,14 @@ int evaluateParentheses(string str) {
     return result;
 }
 
-bool isDigit(char c) {
+bool isDigit(char c) 
+{
     return (c >= '0' && c <= '9');
 }
 
-bool hasOnlyNumbersOrOperations(string str) {
-    if (simplifyExpression(str) == 0) return false;
+bool hasOnlyNumbersOrOperations(string str) 
+{
+    if(simplifyExpression(str) == 0) return false;
     for (char c : str) {
         if (!(c == '+' || c == '-' || c == '*' || c == '/' || c == ' ' || c == '(' || c == ')' || isDigit(c))) {
             return false;
@@ -113,26 +105,35 @@ bool hasOnlyNumbersOrOperations(string str) {
 }
 
 
-int main() {
-    const string OUTPUT_FILE = "out.txt";
-
+int main( int argc, char *argv[] )
+{
+    // if one file is provided everything is nice
+   if( argc == 2 ) 
+   {
+    cout << endl;
+    cout << "The argument supplied is " << argv[1] << endl;
+    cout << endl;
     ifstream inputFile;
-    ofstream outputFile;    //Is this the correct way of reading and writing, read about it in notion
-
-    inputFile.open("in.txt");   //but it should be provided from cmd
+    inputFile.open(argv[1]);
+    if (!(inputFile.good()))
+    {
+        return EXIT_FAILURE;
+    }
 
     if (!inputFile) 
     {
-        cerr << "Unable to open file";
-        return 1; // Maybe different error
+        cerr << "Unable to open input file";
+        return 1;
     }
 
+    ofstream outputFile;
+    const string OUTPUT_FILE = "out.txt";
     outputFile.open(OUTPUT_FILE);
 
     if (!outputFile) 
     {
-        cerr << "Unable to open file";
-        return 1; // Maybe different error
+        cerr << "Unable to open output file";
+        return 1;
     }
 
     string line;
@@ -141,42 +142,68 @@ int main() {
         if(hasOnlyNumbersOrOperations(line))
         {
               cout << evaluateParentheses(line) << endl;
-              cout << endl;
+              outputFile << evaluateParentheses(line) << endl;
+        }
+        else if (line.empty())
+        {
+            cout << endl;
+            outputFile << endl;
         }
         else if (simplifyExpression(line) == 0)
         {
-            cout << endl;
-            cout << endl;
+            cout << "0" << endl;
+            outputFile << "0" << endl;
         }
         else
         {
             cout << "Error: invalid expression" << endl;
-            cout << endl;
+            outputFile << "Error: invalid expression" << endl;
         }
     }
 
-
-    // cout << endl;
-    // cout << "Use case is:    ./main.cpp <filename.txt>" << endl;
-    // cout << "If no file name is detected, you will need to enter expression manually" << endl;
-    // cout << "Quit by typing \"q\" or \"exit\" and [Enter]" << endl;
-    // cout << endl;
-    // cout << "Please enter the expresion" << endl;
-    //while(true)
-    //if(input == "quit") break;
-
-    //if file does not exist:
-    //return EXIT_FAILURE
-
-
-    //if user enters nothing:
-
-    // cout << "No file name entered" << endl;
-    // cout << "Please enter an expression" << endl;
-    //cin >> string;
-
-
     inputFile.close();
+    outputFile.seekp(-1, ios_base::cur);
+    outputFile.put(' ');
     outputFile.close();
+   }
+
+
+
+   else if( argc > 2 ) 
+   {
+        cout << "Too many arguments supplied" << endl;
+        return 0;
+   }
+   else 
+   {
+        cout << endl;
+        cout << "Usage: " << argv[0] << " <filename>" << endl;
+        cout << "One argument was expected. But now please enter expression you would like to simplify" << endl;
+        cout << "Quit by typing \"q\" or \"exit\" and [Enter]" << endl;
+        string expression;
+        while(true)
+        {
+            getline(cin, expression);
+            if(expression == "q" || expression == "exit") return 0;
+
+            if(hasOnlyNumbersOrOperations(expression))
+            {
+                cout << evaluateParentheses(expression) << endl;
+            }
+            else if (expression.empty())
+            {
+                cout << endl;
+            }
+            else if (simplifyExpression(expression) == 0)
+            {
+                cout << "0" << endl;
+            }
+            else
+            {
+                cout << "Error: invalid expression" << endl;
+            }
+
+        }
+   }
     return 0;
 }
