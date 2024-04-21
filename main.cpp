@@ -9,6 +9,9 @@
 #include <iomanip>
 #include <sstream>
 #include <cstdlib> 
+#include <sys/stat.h>
+#include <unistd.h>
+
 
 using namespace std;
 
@@ -25,6 +28,11 @@ using namespace std;
         
 //     }
 // }
+
+bool fileExists (const string& name) {
+  struct stat buffer;   
+  return (stat (name.c_str(), &buffer) == 0); 
+}
 
 int simplifyExpression(const string& expression) 
 {
@@ -56,6 +64,7 @@ int simplifyExpression(const string& expression)
         }
     }
 
+        //For the last number
         if (inNumber) {
             if (op == '+') {
                 result += num;
@@ -110,75 +119,82 @@ int main( int argc, char *argv[] )
     // if one file is provided everything is nice
    if( argc == 2 ) 
    {
-    cout << endl;
-    cout << "The argument supplied is " << argv[1] << endl;
-    cout << endl;
-    ifstream inputFile;
-    inputFile.open(argv[1]);
-    if (!(inputFile.good()))
-    {
-        return EXIT_FAILURE;
-    }
 
-    if (!inputFile) 
-    {
-        cerr << "Unable to open input file";
-        return 1;
-    }
-
-    ofstream outputFile;
-    const string OUTPUT_FILE = "out.txt";
-    outputFile.open(OUTPUT_FILE);
-
-    if (!outputFile) 
-    {
-        cerr << "Unable to open output file";
-        return 1;
-    }
-
-    string line;
-    while (getline(inputFile, line)) 
-    {
-        if(hasOnlyNumbersOrOperations(line))
+        ifstream inputFile;
+        
+        if (!fileExists(argv[1]))
         {
-              cout << evaluateParentheses(line) << endl;
-              outputFile << evaluateParentheses(line) << endl;
+            return EXIT_FAILURE;
         }
-        else if (line.empty())
+
+        inputFile.open(argv[1]);
+        if (!inputFile) 
+        {
+            cerr << "Unable to open input file";
+            return 1;
+        }
+
+        ofstream outputFile;
+        const string OUTPUT_FILE = "out.txt";
+        outputFile.open(OUTPUT_FILE);
+
+        if (!outputFile) 
+        {
+            cerr << "Unable to open output file";
+            return 1;
+        }
+
+        string line;
+        while (getline(inputFile, line)) 
+        {
+            if(hasOnlyNumbersOrOperations(line))
+            {
+                cout << evaluateParentheses(line) << endl;
+                outputFile << evaluateParentheses(line) << endl;
+            }
+            else if (line.empty())
+            {
+                cout << endl;
+                outputFile << endl;
+            }
+            else if (evaluateParentheses(line) == 0)
+            {
+                cout << evaluateParentheses(line) << endl;
+                outputFile << evaluateParentheses(line) << endl;
+            }
+            else
+            {
+                cerr << "Error: invalid expression" << endl;
+                outputFile << "Error: invalid expression" << endl;
+            }
+        }
+
+        inputFile.close();
+        outputFile.seekp(-1, ios_base::cur);
+        outputFile.put(' ');
+        outputFile.close();
+        if (!outputFile.is_open())
         {
             cout << endl;
-            outputFile << endl;
+            cout << "All answers were also successfully saved to " << OUTPUT_FILE << endl;
+            cout << endl;
         }
-        else if (simplifyExpression(line) == 0)
-        {
-            cout << "0" << endl;
-            outputFile << "0" << endl;
-        }
-        else
-        {
-            cout << "Error: invalid expression" << endl;
-            outputFile << "Error: invalid expression" << endl;
-        }
-    }
-
-    inputFile.close();
-    outputFile.seekp(-1, ios_base::cur);
-    outputFile.put(' ');
-    outputFile.close();
    }
 
 
 
    else if( argc > 2 ) 
    {
-        cout << "Too many arguments supplied" << endl;
+        cerr << "Too many arguments supplied" << endl;
         return 0;
    }
+
    else 
    {
         cout << endl;
         cout << "Usage: " << argv[0] << " <filename>" << endl;
         cout << "One argument was expected. But now please enter expression you would like to simplify" << endl;
+        cout << "Or you can also enter file name ending with [.txt] from which you would like expressions to be simplified" << endl;
         cout << "Quit by typing \"q\" or \"exit\" and [Enter]" << endl;
         string expression;
         while(true)
@@ -186,23 +202,92 @@ int main( int argc, char *argv[] )
             getline(cin, expression);
             if(expression == "q" || expression == "exit") return 0;
 
-            if(hasOnlyNumbersOrOperations(expression))
+            if (expression.length() >= 4 && expression.substr(expression.length() - 4) == ".txt")
             {
-                cout << evaluateParentheses(expression) << endl;
-            }
-            else if (expression.empty())
+            ifstream inputFile;
+            if (!fileExists(expression))
             {
-                cout << endl;
-            }
-            else if (simplifyExpression(expression) == 0)
-            {
-                cout << "0" << endl;
-            }
-            else
-            {
-                cout << "Error: invalid expression" << endl;
+                return EXIT_FAILURE;
             }
 
+            inputFile.open(expression);
+            if (!inputFile) 
+            {
+                cerr << "Unable to open input file";
+                return 1;
+            }
+
+            ofstream outputFile;
+            const string OUTPUT_FILE = "out.txt";
+            outputFile.open(OUTPUT_FILE);
+
+            if (!outputFile) 
+            {
+                cerr << "Unable to open output file";
+                return 1;
+            }
+
+            string line;
+            while (getline(inputFile, line)) 
+            {
+                if(hasOnlyNumbersOrOperations(line))
+                {
+                    cout << evaluateParentheses(line) << endl;
+                    outputFile << evaluateParentheses(line) << endl;
+                }
+                else if (line.empty())
+                {
+                    cout << endl;
+                    outputFile << endl;
+                }
+                else if (evaluateParentheses(line) == 0)
+                {
+                    cout << evaluateParentheses(line) << endl;
+                    outputFile << evaluateParentheses(line) << endl;
+                }
+                else
+                {
+                    cerr << "Error: invalid expression" << endl;
+                    outputFile << "Error: invalid expression" << endl;
+                }
+            }
+
+                inputFile.close();
+                outputFile.seekp(-1, ios_base::cur);
+                outputFile.put(' ');
+                outputFile.close();
+                if (!outputFile.is_open())
+                {
+                    cout << endl;
+                    cout << "All answers were also successfully saved to " << OUTPUT_FILE << endl;
+                    cout << endl;
+                    return 0;
+                }
+            }
+
+
+
+            else 
+            {
+                if(expression == "q" || expression == "exit") return 0;
+
+                if(hasOnlyNumbersOrOperations(expression))
+                {
+                    cout << evaluateParentheses(expression) << endl;
+                }
+                else if (expression.empty())
+                {
+                    cout << endl;
+                }
+                else if (evaluateParentheses(expression) == 0)
+                {
+                    cout << evaluateParentheses(expression) << endl;
+                }
+                else
+                {
+                    cerr << "Error: invalid expression" << endl;
+                }
+            }
         }
    }
     return 0;
