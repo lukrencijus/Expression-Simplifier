@@ -28,8 +28,10 @@ using namespace std;
         
 //     }
 // }
+const string OUTPUT_FILE = "out.txt";
 
-bool fileExists (const string& name) {
+bool fileExists (const string& name) 
+{
   struct stat buffer;   
   return (stat (name.c_str(), &buffer) == 0); 
 }
@@ -113,35 +115,30 @@ bool hasOnlyNumbersOrOperations(string str)
     return true;
 }
 
-
-int main( int argc, char *argv[] )
+int areFilesGood(string arg) 
 {
-    // if one file is provided everything is nice
-   if( argc == 2 ) 
-   {
-
         ifstream inputFile;
         
-        if (!fileExists(argv[1]))
+        if (!fileExists(arg))
         {
+            cerr << "File does not exist " << arg << endl;
             return EXIT_FAILURE;
         }
 
-        inputFile.open(argv[1]);
+        inputFile.open(arg);
         if (!inputFile) 
         {
             cerr << "Unable to open input file";
-            return 1;
+            return EXIT_FAILURE;
         }
 
         ofstream outputFile;
-        const string OUTPUT_FILE = "out.txt";
         outputFile.open(OUTPUT_FILE);
 
         if (!outputFile) 
         {
             cerr << "Unable to open output file";
-            return 1;
+            return EXIT_FAILURE;
         }
 
         string line;
@@ -179,16 +176,25 @@ int main( int argc, char *argv[] )
             cout << "All answers were also successfully saved to " << OUTPUT_FILE << endl;
             cout << endl;
         }
+    return EXIT_SUCCESS;
+}
+
+int main( int argc, char *argv[] )
+{
+    //If one file is provided everything is nice
+   if( argc == 2 ) 
+   {
+        if(areFilesGood(argv[1]) != EXIT_SUCCESS) return EXIT_FAILURE;
    }
 
-
-
+    //If more than one file names provided it is not nice
    else if( argc > 2 ) 
    {
         cerr << "Too many arguments supplied" << endl;
         return 0;
    }
 
+    //If user does not provide anything
    else 
    {
         cout << endl;
@@ -204,73 +210,12 @@ int main( int argc, char *argv[] )
 
             if (expression.length() >= 4 && expression.substr(expression.length() - 4) == ".txt")
             {
-            ifstream inputFile;
-            if (!fileExists(expression))
-            {
-                return EXIT_FAILURE;
+                if(areFilesGood(expression) != EXIT_SUCCESS) return EXIT_FAILURE;
+                break;
             }
 
-            inputFile.open(expression);
-            if (!inputFile) 
+            else
             {
-                cerr << "Unable to open input file";
-                return 1;
-            }
-
-            ofstream outputFile;
-            const string OUTPUT_FILE = "out.txt";
-            outputFile.open(OUTPUT_FILE);
-
-            if (!outputFile) 
-            {
-                cerr << "Unable to open output file";
-                return 1;
-            }
-
-            string line;
-            while (getline(inputFile, line)) 
-            {
-                if(hasOnlyNumbersOrOperations(line))
-                {
-                    cout << evaluateParentheses(line) << endl;
-                    outputFile << evaluateParentheses(line) << endl;
-                }
-                else if (line.empty())
-                {
-                    cout << endl;
-                    outputFile << endl;
-                }
-                else if (evaluateParentheses(line) == 0)
-                {
-                    cout << evaluateParentheses(line) << endl;
-                    outputFile << evaluateParentheses(line) << endl;
-                }
-                else
-                {
-                    cerr << "Error: invalid expression" << endl;
-                    outputFile << "Error: invalid expression" << endl;
-                }
-            }
-
-                inputFile.close();
-                outputFile.seekp(-1, ios_base::cur);
-                outputFile.put(' ');
-                outputFile.close();
-                if (!outputFile.is_open())
-                {
-                    cout << endl;
-                    cout << "All answers were also successfully saved to " << OUTPUT_FILE << endl;
-                    cout << endl;
-                    return 0;
-                }
-            }
-
-
-
-            else 
-            {
-                if(expression == "q" || expression == "exit") return 0;
-
                 if(hasOnlyNumbersOrOperations(expression))
                 {
                     cout << evaluateParentheses(expression) << endl;
