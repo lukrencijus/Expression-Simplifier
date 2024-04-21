@@ -30,12 +30,22 @@ using namespace std;
 // }
 const string OUTPUT_FILE = "out.txt";
 
+class CustomException {
+public:
+    CustomException(const string& message) : errorMessage(message) {}
+    const char* what() const { return errorMessage.c_str(); }
+
+private:
+    string errorMessage;
+};
+
 bool fileExists (const string& name) 
 {
   struct stat buffer;   
   return (stat (name.c_str(), &buffer) == 0); 
 }
 
+//If digit is in a row two times or more we must x10 it because it is a multi-digit number
 int simplifyExpression(const string& expression) 
 {
     int result = 0;
@@ -66,7 +76,7 @@ int simplifyExpression(const string& expression)
         }
     }
 
-        //For the last number
+        //For the last digit in an expression
         if (inNumber) {
             if (op == '+') {
                 result += num;
@@ -82,7 +92,10 @@ int simplifyExpression(const string& expression)
         return (result);
 }
 
-int evaluateParentheses(string str) 
+//Find "(", write everything until "(" to temp
+//send it into a deeper while loop that finds ")" 
+//only then sends it to be simplified
+int evaluateParentheses(const string& str) 
 {
     int result = 0;
     string temp;
@@ -93,18 +106,19 @@ int evaluateParentheses(string str)
         string inside;
         while (getline(ss2, inside, ')')) 
         {
-            result = simplifyExpression(inside);
+            result += simplifyExpression(inside);
         }
     }
     return result;
 }
 
+//Check if it a number using ASCII
 bool isDigit(char c) 
 {
     return (c >= '0' && c <= '9');
 }
 
-bool hasOnlyNumbersOrOperations(string str) 
+bool hasOnlyNumbersOrOperations(const string& str) 
 {
     if(simplifyExpression(str) == 0) return false;
     for (char c : str) {
@@ -115,20 +129,28 @@ bool hasOnlyNumbersOrOperations(string str)
     return true;
 }
 
-int areFilesGood(string arg) 
+int areFilesGood(const string& arg) 
 {
         ifstream inputFile;
         
         if (!fileExists(arg))
         {
-            cerr << "File does not exist " << arg << endl;
+            try {
+                throw CustomException("File does not exist");
+            } catch (const CustomException& e) {
+                cerr << "ERROR: " << e.what() << endl;
+            }
             return EXIT_FAILURE;
         }
 
         inputFile.open(arg);
         if (!inputFile) 
         {
-            cerr << "Unable to open input file";
+             try {
+                throw CustomException("Unable to open input file");
+            } catch (const CustomException& e) {
+                cerr << "ERROR: " << e.what() << endl;
+            }
             return EXIT_FAILURE;
         }
 
@@ -137,7 +159,11 @@ int areFilesGood(string arg)
 
         if (!outputFile) 
         {
-            cerr << "Unable to open output file";
+             try {
+                throw CustomException("Unable to open output file");
+            } catch (const CustomException& e) {
+                cerr << "ERROR: " << e.what() << endl;
+            }
             return EXIT_FAILURE;
         }
 
@@ -161,8 +187,12 @@ int areFilesGood(string arg)
             }
             else
             {
-                cerr << "Error: invalid expression" << endl;
-                outputFile << "Error: invalid expression" << endl;
+                try {
+                    throw CustomException("Invalid expression");
+                } catch (const CustomException& e) {
+                    cerr << "ERROR: " << e.what() << endl;
+                    outputFile << "ERROR: " << e.what() << endl;
+                }
             }
         }
 
@@ -190,7 +220,11 @@ int main( int argc, char *argv[] )
     //If more than one file names provided it is not nice
    else if( argc > 2 ) 
    {
-        cerr << "Too many arguments supplied" << endl;
+         try {
+                throw CustomException("Too many arguments supplied");
+            } catch (const CustomException& e) {
+                cerr << "ERROR: " << e.what() << endl;
+            }
         return 0;
    }
 
@@ -200,7 +234,7 @@ int main( int argc, char *argv[] )
         cout << endl;
         cout << "Usage: " << argv[0] << " <filename>" << endl;
         cout << "One argument was expected. But now please enter expression you would like to simplify" << endl;
-        cout << "Or you can also enter file name ending with [.txt] from which you would like expressions to be simplified" << endl;
+        cout << "Or you can enter file name ending with [.txt] from which you would like expressions to be simplified" << endl;
         cout << "Quit by typing \"q\" or \"exit\" and [Enter]" << endl;
         string expression;
         while(true)
@@ -230,7 +264,11 @@ int main( int argc, char *argv[] )
                 }
                 else
                 {
-                    cerr << "Error: invalid expression" << endl;
+                    try {
+                        throw CustomException("Invalid expression");
+                        } catch (const CustomException& e) {
+                            cerr << "ERROR: " << e.what() << endl;
+                    }
                 }
             }
         }
