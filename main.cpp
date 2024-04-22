@@ -14,7 +14,7 @@
 
 //FIXME
 //unary negation
-//multiplication and division priorities
+//priorities for multiplication and division
 
 //TODO
 //OOP classes
@@ -25,7 +25,6 @@
 using namespace std;
 
 const string OUTPUT_FILE = "out.txt";
-
 
 class CustomException {
     public:
@@ -38,8 +37,6 @@ class CustomException {
         string errorMessage;
 };
 
-
-
 class Validation {
     public:
 
@@ -47,7 +44,8 @@ class Validation {
         bool hasOnlySpaces(string input) 
         {
             for (char c : input) {
-                if (!isspace(c)) {
+                if (!isspace(c)) 
+                {
                     return false;
                 }
             }
@@ -72,19 +70,18 @@ class Validation {
         {
             if (hasOnlySpaces(str)) return false;
             for (char c : str) {
-                if (!(c == '+' || c == '-' || c == '*' || c == '/' || c == ' ' || c == '(' || c == ')' || isDigit(c))) {
+                if (!(c == '+' || c == '-' || c == '*' || c == '/' || c == ' ' || c == '(' || c == ')' || isDigit(c))) 
+                {
                     return false;
                 }
             }
             return true;
         }
-
 };
-
-
 
 class Simplifier {
     private:
+
         Validation check;
 
     public:
@@ -98,19 +95,31 @@ class Simplifier {
             bool inNumber = false;
             char op = '+';
 
-        for (char c : expression) {
-                if (isdigit(c)) {
+            for (char c : expression) 
+            {
+                if (isdigit(c)) 
+                {
                     num = num * 10 + (c - '0');
                     inNumber = true;
-                } else if (c == '+' || c == '-' || c == '*' || c == '/') {
-                    if (inNumber) {
-                        if (op == '+') {
+                } 
+                else if (c == '+' || c == '-' || c == '*' || c == '/') 
+                {
+                    if (inNumber) 
+                    {
+                        if (op == '+') 
+                        {
                             result += num;
-                        } else if (op == '-') {
+                        } 
+                        else if (op == '-') 
+                        {
                             result -= num;
-                        } else if (op == '*') {
+                        } 
+                        else if (op == '*') 
+                        {
                             result *= num;
-                        } else if (op == '/') {
+                        } 
+                        else if (op == '/') 
+                        {
                             result /= num;
                         }
                         num = 0;
@@ -120,24 +129,32 @@ class Simplifier {
                 }
             }
 
-                //For the last digit in an expression
-                if (inNumber) {
-                    if (op == '+') {
-                        result += num;
-                    } else if (op == '-') {
-                        result -= num;
-                    } else if (op == '*') {
-                        result *= num;
-                    } else if (op == '/') {
-                        result /= num;
-                    }
+            //For the last digit in an expression
+            if (inNumber) 
+            {
+                if (op == '+') 
+                {
+                    result += num;
+                } 
+                else if (op == '-') 
+                {
+                    result -= num;
+                } 
+                else if (op == '*') 
+                {
+                    result *= num;
+                } 
+                else if (op == '/') 
+                {
+                    result /= num;
                 }
+            }
 
-                return (result);
+            return (result);
         }
 
-        //Find "(", write everything until "(" to temp
-        //send it into a deeper while loop that finds ")" 
+        //Find "(", write everything until ")" to temp
+        //send it into a deeper while loop that finds "(" 
         //only then sends it to be simplified
         int evaluateParentheses(const string& str) 
         {
@@ -157,28 +174,29 @@ class Simplifier {
         }
 
         //Reading from provided file as input and writing it to output file
-        void readingAndWritingStdout(const string& line){
-                if(check.hasOnlyNumbersOrOperations(line))
-                {
-                    cout << evaluateParentheses(line) << endl;
-                }
-                else if (line.empty())
-                {
-                    cout << endl;
-                }
-                else if (evaluateParentheses(line) == 0 && check.hasOnlyNumbersOrOperations(line))
-                {
-                    cout << evaluateParentheses(line) << endl;
-                }
-                else
-                {
-                    try {
-                        throw CustomException("Invalid expression");
-                        } catch (const CustomException& e) {
-                            cerr << "ERROR: " << e.what() << endl;
-                    }
+        void readingAndWritingStdout(const string& line)
+        {
+            if(check.hasOnlyNumbersOrOperations(line))
+            {
+                cout << evaluateParentheses(line) << endl;
+            }
+            else if (line.empty())
+            {
+                cout << endl;
+            }
+            else if (evaluateParentheses(line) == 0 && check.hasOnlyNumbersOrOperations(line))
+            {
+                cout << evaluateParentheses(line) << endl;
+            }
+            else
+            {
+                try {
+                    throw CustomException("Invalid expression");
+                    } catch (const CustomException& e) {
+                        cerr << "ERROR: " << e.what() << endl;
                 }
             }
+        }
 
         //Reading from provided file as command line argument and writing it to output file
         void readingAndWritingFile(const string& arg)
@@ -236,7 +254,6 @@ class Simplifier {
         int areFilesGood(const string& arg) 
         {
             ifstream inputFile;
-                
             if (!check.fileExists(arg))
             {
                 try {
@@ -260,7 +277,6 @@ class Simplifier {
 
             ofstream outputFile;
             outputFile.open(OUTPUT_FILE);
-
             if (!outputFile) 
             {
                 try {
@@ -271,8 +287,9 @@ class Simplifier {
                 return EXIT_FAILURE;
             }
             return EXIT_SUCCESS;
-    }
+        }
 };
+
 
 
 int main( int argc, char *argv[] )
