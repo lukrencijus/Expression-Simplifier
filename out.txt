@@ -1,16 +1,18 @@
 25
-
+0
+7
+35
 9
 0
 ERROR: Invalid expression
+ERROR: Invalid expression
 5
 10
-10
 20
-12
 54
--5
-45
+54
+5
+25
 10
--5
-316 
+5
+6 
