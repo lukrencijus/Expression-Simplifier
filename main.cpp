@@ -30,6 +30,15 @@ using namespace std;
 // }
 const string OUTPUT_FILE = "out.txt";
 
+bool hasOnlySpaces(string input) {
+    for (char c : input) {
+        if (!isspace(c)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 class CustomException {
 public:
     CustomException(const string& message) : errorMessage(message) {}
@@ -45,81 +54,51 @@ bool fileExists (const string& name)
   return (stat (name.c_str(), &buffer) == 0); 
 }
 
-
-// Function to parse and evaluate addition and subtraction
-int additionAndSubtraction(const std::string& expression) {
+//If digit is in a row two times or more we must x10 it because it is a multi-digit number
+int simplifyExpression(const string& expression) 
+{
     int result = 0;
+    int sum = 0;
     int num = 0;
-    char op = '-';
+    bool inNumber = false;
+    char op = '+';
 
-    for (char c : expression) {
+   for (char c : expression) {
         if (isdigit(c)) {
             num = num * 10 + (c - '0');
-        } else {
+            inNumber = true;
+        } else if (c == '+' || c == '-' || c == '*' || c == '/') {
+            if (inNumber) {
+                if (op == '+') {
+                    result += num;
+                } else if (op == '-') {
+                    result -= num;
+                } else if (op == '*') {
+                    result *= num;
+                } else if (op == '/') {
+                    result /= num;
+                }
+                num = 0;
+                inNumber = false;
+            }
+            op = c;
+        }
+    }
+
+        //For the last digit in an expression
+        if (inNumber) {
             if (op == '+') {
                 result += num;
             } else if (op == '-') {
                 result -= num;
-            }
-            num = 0;
-            op = c;
-        }
-    }
-    if (op == '+') {
-        result += num;
-    } else if (op == '-') {
-        result -= num;
-    }
-    return result;
-}
-
-// Function to parse and evaluate multiplication and division
-int multiplicationAndDivision(const std::string& expression) {
-    int result = 0;
-    int num = 0;
-    char op = '*'; // Default operation is multiplication
-
-    for (char c : expression) {
-        if (isdigit(c)) {
-            num = num * 10 + (c - '0');
-        } else {
-            if (op == '*') {
-                result = (result == 0) ? num : result * num;
+            } else if (op == '*') {
+                result *= num;
             } else if (op == '/') {
                 result /= num;
             }
-            num = 0;
-            op = c;
         }
-    }
-    if (op == '*') {
-        result = (result == 0) ? num : result * num;
-    } else if (op == '/') {
-        result /= num;
-    }
-    return result;
-}
 
-// Function to evaluate expressions combining addition/subtraction and multiplication/division
-int evaluateExpression(const std::string& expression) {
-    // Find the first occurrence of '+' or '-'
-    size_t plus_minus_pos = expression.find_first_of("+-");
-    if (plus_minus_pos == std::string::npos) {
-        // If '+' or '-' not found, evaluate only multiplication and division
-        return multiplicationAndDivision(expression);
-    } else {
-        // Evaluate the part before '+' or '-' recursively
-        int left_result = multiplicationAndDivision(expression.substr(0, plus_minus_pos));
-        // Evaluate the part after '+' or '-' recursively
-        int right_result = evaluateExpression(expression.substr(plus_minus_pos + 1));
-
-        // Perform addition or subtraction based on the operator
-        if (expression[plus_minus_pos] == '+') {
-            return left_result + right_result;
-        } else {
-            return left_result - right_result;
-        }
-    }
+        return (result);
 }
 
 //Find "(", write everything until "(" to temp
@@ -136,7 +115,7 @@ int evaluateParentheses(const string& str)
         string inside;
         while (getline(ss2, inside, '(')) 
         {
-            result += evaluateExpression(inside);
+            result += simplifyExpression(inside);
         }
     }
     return result;
@@ -150,6 +129,7 @@ bool isDigit(char c)
 
 bool hasOnlyNumbersOrOperations(const string& str) 
 {
+    if (hasOnlySpaces(str)) return false;
     for (char c : str) {
         if (!(c == '+' || c == '-' || c == '*' || c == '/' || c == ' ' || c == '(' || c == ')' || isDigit(c))) {
             return false;
@@ -204,7 +184,7 @@ int areFilesGood(const string& arg)
                 cout << evaluateParentheses(line) << endl;
                 outputFile << evaluateParentheses(line) << endl;
             }
-            else if (line.empty())
+            else if (hasOnlySpaces(line))
             {
                 cout << endl;
                 outputFile << endl;
