@@ -1,3 +1,16 @@
+// Lukas Šerelis, April 24, 2024
+// lukas.serelis@mif.stud.vu.lt
+
+// Vilnius University Faculty of Mathematics and Informatics
+// Object-Oriented Programming course
+// Lecturer: Irmantas Radavicius
+
+// Visual Studio Code 1.88.1   macOS 14.4   arm64
+// Compiler: g++ 12 (GNU C++ Compiler)
+
+// THE EXPRESSION SIMPLIFIER
+// Program simplifies mathematical expressions containing parentheses, operators, and numbers.
+// It reads input from the command line or a file, simplifies each expression, and prints the result to the console and an output file.
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -29,7 +42,7 @@ class CustomException {
 class Validation {
     public:
 
-        //Check if string is empty
+        // Check if string is empty
         bool hasOnlySpaces(const string& input) 
         {
             for (char c : input) {
@@ -41,20 +54,20 @@ class Validation {
             return true;
         }
 
-        //Check if file exists
+        // Check if file exists
         bool doesFileExist(const string& name) 
         {
             struct stat buffer;   
             return (stat (name.c_str(), &buffer) == 0); 
         }
 
-        //Check if it is a number using ASCII
+        // Check if it is a number using ASCII
         bool isDigit(char c) 
         {
             return (c >= '0' && c <= '9');
         }
 
-        //Check if string includes numbers or operators
+        // Check if string includes numbers or operators
         bool hasOnlyNumbersOrOperations(const string& str) 
         {
             if (hasOnlySpaces(str)) return false;
@@ -68,7 +81,7 @@ class Validation {
             return true;
         }
 
-        //Checking if files exists, can they be opened
+        // Checking if files exists, can they be opened
         int areFilesGood(const string& arg) 
         {
             ifstream inputFile;
@@ -126,7 +139,7 @@ class Simplifier {
 
         int* results;
 
-        //If digit is in a row two times or more we must x10 it because it is a multi-digit number
+        // If digit is in a row two times or more we must x10 it because it is a multi-digit number
         int simplifyExpression(const string& expression) 
         {
             *result = 0;
@@ -224,9 +237,9 @@ class Simplifier {
             delete results;
         }
 
-        //Find ")", write everything until it to temp
-        //send it into a deeper while loop that finds "(" 
-        //only then sends it to be simplified
+        // Find ")", write everything until it to temp
+        // send it into a deeper while loop that finds "(" 
+        // only then sends it to be simplified
         int evaluateParentheses(const string& str) 
         {
             *results = 0;
@@ -242,7 +255,7 @@ class Simplifier {
             return *results;
         }
 
-        //Reading from command line as input and writing it to command line
+        // Reading from command line as input and writing it to command line
         void readingAndWritingStdout(const string& line)
         {
             if(check.hasOnlyNumbersOrOperations(line))
@@ -267,8 +280,8 @@ class Simplifier {
             }
         }
 
-        //Reading from provided file as command line argument
-        //writing it to command line and output file
+        // Reading from provided file as command line argument
+        // writing it to command line and output file
         void readingAndWritingFile(const string& arg)
         {
             ifstream inputFile;
@@ -326,14 +339,14 @@ int main( int argc, char *argv[] )
     Simplifier simp;
     Validation check;
 
-    //If only one file is provided everything is nice
+    // If only one file is provided everything is nice
    if( argc == 2 ) 
    {
         if(check.areFilesGood(argv[1]) != EXIT_SUCCESS) return EXIT_FAILURE;
         simp.readingAndWritingFile(argv[1]);
    }
 
-    //If more than one file provided it is not nice
+    // If more than one file provided it is not nice
    else if( argc > 2 ) 
    {
         try {
@@ -344,7 +357,7 @@ int main( int argc, char *argv[] )
         return 0;
    }
 
-    //If user does not provide anything
+    // If user does not provide anything
    else 
    {
         cout << endl;
